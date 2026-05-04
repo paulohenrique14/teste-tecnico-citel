@@ -1,0 +1,68 @@
+unit uDm;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
+  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.MySQL,
+  FireDAC.Phys.MySQLDef, FireDAC.VCLUI.Wait, Data.DBXMySQL, Data.SqlExpr,
+  Data.DB, FireDAC.Comp.Client, System.IniFiles;
+
+type
+  TFrmDm = class(TDataModule)
+    FDMainConnection: TFDConnection;
+    FDPhysMySQLDriverLink1: TFDPhysMySQLDriverLink;
+    procedure DataModuleCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmDm: TFrmDm;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+procedure TFrmDm.DataModuleCreate(Sender: TObject);
+var
+  ini     : TIniFile;
+  sArquivo: string;
+begin
+  sArquivo := ExtractFilePath(ParamStr(0).Substring(0, 16)) + 'config.ini';
+
+  // cria o arquivo com valores padrão se não existir
+  if not FileExists(sArquivo) then
+  begin
+    ini := TIniFile.Create(sArquivo);
+    try
+      ini.WriteString('Database', 'Server',   'localhost');
+      ini.WriteString('Database', 'Port',     '3306');
+      ini.WriteString('Database', 'Database', 'db_pedidos');
+      ini.WriteString('Database', 'User',     'root');
+      ini.WriteString('Database', 'Password', 'root');
+    finally
+      ini.Free;
+    end;
+  end;
+
+  // agora lê e aplica
+  ini := TIniFile.Create(sArquivo);
+  try
+    FDMainConnection.Params.Values['Server'   ] := ini.ReadString('Database', 'Server', 'localhost');
+    FDMainConnection.Params.Values['Port'     ] := ini.ReadString('Database', 'Port', '3308');
+    FDMainConnection.Params.Values['Database' ] := ini.ReadString('Database', 'Database', 'db_pedidos');
+    FDMainConnection.Params.Values['User_Name'] := ini.ReadString('Database', 'User', 'root');
+    FDMainConnection.Params.Values['Password' ] := ini.ReadString('Database', 'Password', 'root');
+    FDMainConnection.Connected := True;
+  finally
+    ini.Free;
+  end;
+end;
+
+end.

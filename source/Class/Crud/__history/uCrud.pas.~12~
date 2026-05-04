@@ -1,0 +1,55 @@
+unit uCrud;
+
+interface
+
+uses Data.DB, FireDAC.Stan.Intf, uDm,
+  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  dxGDIPlusClasses, Vcl.ExtCtrls, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
+
+type
+
+   ICrud = interface
+      ['{68092FF2-2F53-4B6D-9F69-221DEB340A7F}']
+      function UpdateOrInsert(Data: TFDMemTable; ATransaction: TFDTransaction; ACodeOrder: Integer): Boolean;
+      function Delete(Data: TFDMemTable; ATransaction: TFDTransaction; ACodeOrder: Integer): Boolean;
+//      function DeleteItemById(AItems: TList<TOrderItemDeleted>; ATransaction: TFDTransaction; ACodeOrder: Integer): Boolean;
+   end;
+
+   TCrud = class(TInterfacedObject, ICrud)
+      private
+         procedure SetDatabaseConnection;
+      protected
+         FSqlSave: TFDQuery;
+      public
+         function UpdateOrInsert(Data: TFDMemTable; ATransaction: TFDTransaction; ACodeOrder: Integer): Boolean; virtual; abstract;
+         function Delete(Data: TFDMemTable; ATransaction: TFDTransaction; ACodeOrder: Integer): Boolean; virtual; abstract;
+
+         Constructor Create;
+         Destructor Destroy; override;
+
+   end;
+
+implementation
+
+{ TCrud }
+
+constructor TCrud.Create;
+begin
+   SetDatabaseConnection;
+
+end;
+
+destructor TCrud.Destroy;
+begin
+   FSqlSave.Free;
+   inherited;
+end;
+
+procedure TCrud.SetDatabaseConnection;
+begin
+   FSqlSave := TFDQuery.Create(nil);
+   FSqlSave.Connection := FrmDm.FDMainConnection;
+end;
+
+end.

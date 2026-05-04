@@ -1,0 +1,56 @@
+unit uLookup;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.StdCtrls, Vcl.Grids,
+  Vcl.DBGrids, Vcl.ExtCtrls, uDm, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
+  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client;
+
+type
+  TFrmLookup = class(TForm)
+    Panel1: TPanel;
+    PnlButtons: TPanel;
+    PnlTop: TPanel;
+    DBGrid1: TDBGrid;
+    BtnSelect: TButton;
+    DSLookup: TDataSource;
+    FDLookup: TFDQuery;
+    procedure FormCreate(Sender: TObject);
+  private
+    FTable: String;
+    FCodeField: String;
+    FDescriptionField: String;
+  public
+    Constructor Create(ATable, ACodeField, ADescriptionField: String);
+  end;
+
+var
+  FrmLookup: TFrmLookup;
+
+implementation
+
+{$R *.dfm}
+
+{ TFrmLookup }
+
+constructor TFrmLookup.Create(ATable, ACodeField, ADescriptionField: String);
+begin
+   FTable            := ATable;
+   FCodeField        := ACodeField;
+   FDescriptionField := ADescriptionField;
+
+  inherited Create(nil);
+end;
+
+procedure TFrmLookup.FormCreate(Sender: TObject);
+begin
+   FDLookup.SQL.Text := 'Select '+ FCodeField +','+FDescriptionField+' from '+ FTable;
+
+   FDLookup.Open();
+end;
+
+end.

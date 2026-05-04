@@ -1,0 +1,61 @@
+object FrmDm: TFrmDm
+  OldCreateOrder = False
+  Height = 416
+  Width = 607
+  object FDMainConnection: TFDConnection
+    Params.Strings = (
+      'Database=db_pedidos'
+      'User_Name=root'
+      'Password=root'
+      'Server=localhost'
+      'UseSSL=True'
+      'SSL_cipher=ECDHE-RSA-AES128-GCM-SHA256'
+      'DriverID=MySQL')
+    LoginPrompt = False
+    Left = 168
+    Top = 96
+  end
+  object FDPhysMySQLDriverLink1: TFDPhysMySQLDriverLink
+    VendorLib = 'C:\teste\libmysql.dll'
+    Left = 256
+    Top = 200
+  end
+  object SQLConnection1: TSQLConnection
+    ConnectionName = 'ASAConnection'
+    DriverName = 'MySQL'
+    Params.Strings = (
+      'DriverUnit=Data.DBXMySQL'
+      
+        'DriverPackageLoader=TDBXDynalinkDriverLoader,DbxCommonDriver250.' +
+        'bpl'
+      
+        'DriverAssemblyLoader=Borland.Data.TDBXDynalinkDriverLoader,Borla' +
+        'nd.Data.DbxCommonDriver,Version=24.0.0.0,Culture=neutral,PublicK' +
+        'eyToken=91d62ebb5b0d1b1b'
+      
+        'MetaDataPackageLoader=TDBXMySqlMetaDataCommandFactory,DbxMySQLDr' +
+        'iver250.bpl'
+      
+        'MetaDataAssemblyLoader=Borland.Data.TDBXMySqlMetaDataCommandFact' +
+        'ory,Borland.Data.DbxMySQLDriver,Version=24.0.0.0,Culture=neutral' +
+        ',PublicKeyToken=91d62ebb5b0d1b1b'
+      'GetDriverFunc=getSQLDriverMYSQL'
+      'LibraryName=dbxmys.dll'
+      'LibraryNameOsx=libsqlmys.dylib'
+      'VendorLib=LIBMYSQL.dll'
+      'VendorLibWin64=libmysql.dll'
+      'VendorLibOsx=libmysqlclient.dylib'
+      'HostName=ServerName'
+      'Database=DBNAME'
+      'User_Name=user'
+      'Password=password'
+      'MaxBlobSize=-1'
+      'LocaleCode=0000'
+      'Compressed=False'
+      'Encrypted=False'
+      'BlobSize=-1'
+      'ErrorResourceFile=')
+    Left = 80
+    Top = 264
+  end
+end

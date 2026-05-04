@@ -1,0 +1,71 @@
+object FrmLookup: TFrmLookup
+  Left = 0
+  Top = 0
+  BorderIcons = []
+  BorderStyle = bsNone
+  Caption = 'FrmLookup'
+  ClientHeight = 286
+  ClientWidth = 379
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 379
+    Height = 286
+    Align = alClient
+    BevelEdges = [beTop, beRight]
+    TabOrder = 0
+    ExplicitWidth = 635
+    ExplicitHeight = 299
+    object PnlButtons: TPanel
+      Left = 1
+      Top = 244
+      Width = 377
+      Height = 41
+      Align = alBottom
+      TabOrder = 0
+      ExplicitTop = 297
+      ExplicitWidth = 649
+      object BtnSelect: TButton
+        Left = 280
+        Top = 8
+        Width = 86
+        Height = 25
+        Caption = 'F5 - Selecionar'
+        TabOrder = 0
+      end
+    end
+    object PnlTop: TPanel
+      Left = 1
+      Top = 1
+      Width = 377
+      Height = 41
+      Align = alTop
+      TabOrder = 1
+      ExplicitLeft = 88
+      ExplicitTop = 160
+      ExplicitWidth = 185
+    end
+    object DBGrid1: TDBGrid
+      Left = 1
+      Top = 42
+      Width = 377
+      Height = 202
+      Align = alClient
+      TabOrder = 2
+      TitleFont.Charset = DEFAULT_CHARSET
+      TitleFont.Color = clWindowText
+      TitleFont.Height = -11
+      TitleFont.Name = 'Tahoma'
+      TitleFont.Style = []
+    end
+  end
+end

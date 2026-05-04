@@ -1,0 +1,24 @@
+object FrmDm: TFrmDm
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Height = 416
+  Width = 607
+  object FDMainConnection: TFDConnection
+    Params.Strings = (
+      'Database=db_pedidos'
+      'User_Name=root'
+      'Password=root'
+      'Server=localhost'
+      'DriverID=MySQL')
+    UpdateOptions.AssignedValues = [uvAutoCommitUpdates]
+    UpdateOptions.AutoCommitUpdates = True
+    LoginPrompt = False
+    Left = 168
+    Top = 96
+  end
+  object FDPhysMySQLDriverLink1: TFDPhysMySQLDriverLink
+    VendorLib = 'C:\teste\libmysql.dll'
+    Left = 256
+    Top = 200
+  end
+end

@@ -1,0 +1,199 @@
+object FrmCad: TFrmCad
+  Left = 0
+  Top = 0
+  BorderIcons = []
+  BorderStyle = bsNone
+  ClientHeight = 600
+  ClientWidth = 815
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object PnlMain: TPanel
+    Left = 0
+    Top = 0
+    Width = 815
+    Height = 600
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 0
+    object PnlButtons: TPanel
+      Left = 0
+      Top = 558
+      Width = 815
+      Height = 42
+      Align = alBottom
+      BevelOuter = bvNone
+      Padding.Left = 10
+      Padding.Top = 5
+      Padding.Bottom = 5
+      TabOrder = 0
+      object BtnDelete: TButton
+        Left = 268
+        Top = 5
+        Width = 86
+        Height = 32
+        Align = alLeft
+        Caption = 'F6 - Deletar'
+        TabOrder = 0
+        OnClick = BtnDeleteClick
+        ExplicitLeft = 182
+      end
+      object BtnCreate: TButton
+        Left = 10
+        Top = 5
+        Width = 86
+        Height = 32
+        Align = alLeft
+        Caption = 'F3 - Cadastrar'
+        TabOrder = 1
+        OnClick = BtnCreateClick
+      end
+      object BtnEdit: TButton
+        Left = 96
+        Top = 5
+        Width = 86
+        Height = 32
+        Align = alLeft
+        Caption = 'F4 - Editar'
+        TabOrder = 2
+        OnClick = BtnEditClick
+      end
+      object BtnSave: TButton
+        Left = 182
+        Top = 5
+        Width = 86
+        Height = 32
+        Align = alLeft
+        Caption = 'F5 - Gravar'
+        TabOrder = 3
+        ExplicitLeft = 183
+        ExplicitTop = 6
+        ExplicitHeight = 30
+      end
+      object BtnCancel: TButton
+        Left = 354
+        Top = 5
+        Width = 86
+        Height = 32
+        Align = alLeft
+        Caption = 'Esc - Cancelar'
+        TabOrder = 4
+        OnClick = BtnCancelClick
+        ExplicitLeft = 355
+        ExplicitTop = 6
+        ExplicitHeight = 30
+      end
+    end
+    object PnlTop: TPanel
+      Left = 0
+      Top = 0
+      Width = 815
+      Height = 41
+      Align = alTop
+      BevelOuter = bvNone
+      Padding.Left = 10
+      TabOrder = 1
+      object LblScreenName: TLabel
+        Left = 10
+        Top = 0
+        Width = 566
+        Height = 41
+        Align = alLeft
+        AutoSize = False
+        Caption = 'Screen Name'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        Layout = tlCenter
+        ExplicitLeft = 11
+        ExplicitTop = -3
+        ExplicitHeight = 39
+      end
+      object BtnClose: TImage
+        Left = 781
+        Top = 0
+        Width = 34
+        Height = 41
+        Cursor = crHandPoint
+        Align = alRight
+        Center = True
+        ParentShowHint = False
+        Picture.Data = {
+          0B546478504E47496D61676589504E470D0A1A0A0000000D4948445200000014
+          0000001408060000008D891D0D000000097048597300000B1300000B1301009A
+          9C180000008449444154789CED934B0E80200C44DF51D5B0D11BB9D1036AE267
+          EF27245D1083408DC60D6F4987619A16C87C410B2C4019D0D8DA2ADA28237000
+          1B603C752335AB19E276503817AEA6AED926DA242AE7E20E349EB31A25D73477
+          A955B8A91E278B19DAF61F61DE6CB9F20CC037287E599B59B1D8538A612FDF2A
+          F47A219A2EC530838A1387D849F6F4FEF7CC0000000049454E44AE426082}
+        ShowHint = False
+        OnClick = BtnCloseClick
+        ExplicitLeft = 1224
+        ExplicitTop = 1
+        ExplicitHeight = 55
+      end
+    end
+    object CardPanel: TCardPanel
+      Left = 0
+      Top = 41
+      Width = 815
+      Height = 517
+      Align = alClient
+      ActiveCard = CardBrowse
+      BevelOuter = bvNone
+      TabOrder = 2
+      object CardCreate: TCard
+        Left = 0
+        Top = 0
+        Width = 815
+        Height = 517
+        CardIndex = 0
+        TabOrder = 0
+      end
+      object CardBrowse: TCard
+        Left = 0
+        Top = 0
+        Width = 815
+        Height = 517
+        Caption = 'CardBrowse'
+        CardIndex = 1
+        TabOrder = 1
+        object DBGrid: TDBGrid
+          Left = 0
+          Top = 0
+          Width = 815
+          Height = 517
+          Align = alClient
+          DataSource = DSCad
+          TabOrder = 0
+          TitleFont.Charset = DEFAULT_CHARSET
+          TitleFont.Color = clWindowText
+          TitleFont.Height = -11
+          TitleFont.Name = 'Tahoma'
+          TitleFont.Style = []
+        end
+      end
+    end
+  end
+  object FDCad: TFDQuery
+    Connection = FrmDm.FDMainConnection
+    Left = 216
+    Top = 280
+  end
+  object DSCad: TDataSource
+    OnStateChange = DSCadStateChange
+    Left = 392
+    Top = 272
+  end
+end

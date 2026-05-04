@@ -1,0 +1,18 @@
+program TechnicalTest;
+
+uses
+  Vcl.Forms,
+  uMain in 'uMain.pas' {FrmMain},
+  uDm in 'uDm.pas' {FrmDm: TDataModule},
+  uCad in 'uCad.pas' {FrmCad},
+  uCadSalesOrder in 'uCadSalesOrder.pas' {FrmCadSalesOrder};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TFrmDm, FrmDm);
+  Application.CreateForm(TFrmMain, FrmMain);
+  Application.Run;
+end.

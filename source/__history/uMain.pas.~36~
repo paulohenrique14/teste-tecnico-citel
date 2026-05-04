@@ -1,0 +1,344 @@
+unit uMain;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, dxGDIPlusClasses,
+  Vcl.StdCtrls, System.ImageList, Vcl.ImgList, uCadSalesOrder, Vcl.WinXPanels,
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error,
+  FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async,
+  FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, uDm;
+
+type
+  TFrmMain = class(TForm)
+    PnlMain: TPanel;
+    PnlHeader: TPanel;
+    PnlSidebar: TPanel;
+    ImageList: TImageList;
+    BtnClose: TImage;
+    PnlCard: TPanel;
+    CardPanelMain: TCardPanel;
+    CardCreateMain: TCard;
+    CardUtilsMain: TCard;
+    BtnCardUtils: TButton;
+    BtnCleanDatabase: TButton;
+    BtnSalesOrder: TButton;
+    LblTituloAplicacao: TLabel;
+    procedure BtnCloseClick(Sender: TObject);
+    procedure BtnCardCreateClick(Sender: TObject);
+    procedure BtnCardUtilsClick(Sender: TObject);
+    procedure BtnSalesOrderClick(Sender: TObject);
+    procedure BtnCleanDatabaseClick(Sender: TObject);
+  private
+    procedure CriaBancoDados;
+    procedure PopulaBancoDados;
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmMain: TFrmMain;
+
+implementation
+
+{$R *.dfm}
+
+procedure TFrmMain.BtnCardCreateClick(Sender: TObject);
+begin
+   CardPanelMain.ActiveCard := CardCreateMain
+end;
+
+procedure TFrmMain.BtnCleanDatabaseClick(Sender: TObject);
+begin
+   CriaBancoDados;
+   PopulaBancoDados;
+end;
+
+procedure TFrmMain.BtnCloseClick(Sender: TObject);
+begin
+   Close;
+end;
+
+procedure TFrmMain.BtnSalesOrderClick(Sender: TObject);
+begin
+   FrmCadSalesOrder := TFrmCadSalesOrder.Create(Self);
+   try
+      FrmCadSalesOrder.ShowModal;
+   finally
+      FrmCadSalesOrder.Free;
+   end;
+end;
+
+procedure TFrmMain.CriaBancoDados;
+var
+   FSqlScript: TFDQuery;
+begin
+   if MessageDlg('Deseja recriar o banco de dados? Todos os dados serão perdidos!',
+                 mtConfirmation, [mbYes, mbNo], 0) = mrNo then Exit;
+
+   FSqlScript := TFDQuery.Create(Self);
+   try
+      FSqlScript.Connection := FrmDm.FDMainConnection;
+
+      FrmDm.FDMainConnection.Connected := False;
+      FrmDm.FDMainConnection.Params.Values['Database'] := '';
+      FrmDm.FDMainConnection.Connected := True;
+
+      FSqlScript.SQL.Text := 'DROP DATABASE IF EXISTS db_pedidos';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'CREATE DATABASE db_pedidos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'USE db_pedidos';
+      FSqlScript.ExecSQL;
+
+      FrmDm.FDMainConnection.Connected := False;
+      FrmDm.FDMainConnection.Params.Values['Database'] := 'db_pedidos';
+      FrmDm.FDMainConnection.Connected := True;
+
+      FSqlScript.SQL.Text := 'SET FOREIGN_KEY_CHECKS = 0';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'CREATE TABLE clientes (                          ' +
+                             '  cod_cliente  INT          NOT NULL AUTO_INCREMENT,' +
+                             '  nome         VARCHAR(100) NOT NULL,             ' +
+                             '  cidade       VARCHAR(80)  NOT NULL,             ' +
+                             '  uf           CHAR(2)      NOT NULL,             ' +
+                             '  CONSTRAINT pk_clientes PRIMARY KEY (cod_cliente),' +
+                             '  INDEX idx_clientes_nome (nome),                 ' +
+                             '  INDEX idx_clientes_uf   (uf)                    ' +
+                             ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4           ';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'CREATE TABLE produtos (                           ' +
+                             '  cod_produto  INT            NOT NULL AUTO_INCREMENT,' +
+                             '  descricao    VARCHAR(150)   NOT NULL,            ' +
+                             '  preco_venda  DECIMAL(10, 2) NOT NULL,            ' +
+                             '  CONSTRAINT pk_produtos PRIMARY KEY (cod_produto),' +
+                             '  INDEX idx_produtos_descricao (descricao)         ' +
+                             ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4            ';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'CREATE TABLE pedidos_geral (                              ' +
+                             '  num_pedido   INT            NOT NULL AUTO_INCREMENT,     ' +
+                             '  data_emissao DATE           NOT NULL,                    ' +
+                             '  cod_cliente  INT            NOT NULL,                    ' +
+                             '  valor_total  DECIMAL(10, 2) NOT NULL DEFAULT 0.00,       ' +
+                             '  CONSTRAINT pk_pedidos_geral    PRIMARY KEY (num_pedido), ' +
+                             '  CONSTRAINT fk_pedgeral_cliente FOREIGN KEY (cod_cliente) ' +
+                             '    REFERENCES clientes (cod_cliente)                      ' +
+                             '    ON UPDATE CASCADE ON DELETE RESTRICT,                  ' +
+                             '  INDEX idx_pedgeral_cliente (cod_cliente),                ' +
+                             '  INDEX idx_pedgeral_data    (data_emissao)                ' +
+                             ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4                    ';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'CREATE TABLE pedidos_produtos (                             ' +
+                             '  id           INT            NOT NULL AUTO_INCREMENT,       ' +
+                             '  num_pedido   INT            NOT NULL,                      ' +
+                             '  cod_produto  INT            NOT NULL,                      ' +
+                             '  quantidade   DECIMAL(10, 3) NOT NULL,                      ' +
+                             '  vr_unitario  DECIMAL(10, 2) NOT NULL,                      ' +
+                             '  vr_total     DECIMAL(10, 2) NOT NULL,                      ' +
+                             '  CONSTRAINT pk_pedidos_produtos PRIMARY KEY (id),            ' +
+                             '  CONSTRAINT fk_pedprod_pedido   FOREIGN KEY (num_pedido)    ' +
+                             '    REFERENCES pedidos_geral (num_pedido)                    ' +
+                             '    ON UPDATE CASCADE ON DELETE CASCADE,                     ' +
+                             '  CONSTRAINT fk_pedprod_produto  FOREIGN KEY (cod_produto)   ' +
+                             '    REFERENCES produtos (cod_produto)                        ' +
+                             '    ON UPDATE CASCADE ON DELETE RESTRICT,                    ' +
+                             '  INDEX idx_pedprod_pedido  (num_pedido),                    ' +
+                             '  INDEX idx_pedprod_produto (cod_produto)                    ' +
+                             ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4                      ';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'SET FOREIGN_KEY_CHECKS = 1';
+      FSqlScript.ExecSQL;
+
+      ShowMessage('Banco recriado com sucesso! Execute agora a carga de dados padrão.');
+
+   except
+      on E: Exception do
+      begin
+         try
+            FrmDm.FDMainConnection.Connected := False;
+            FrmDm.FDMainConnection.Params.Values['Database'] := 'db_pedidos';
+            FrmDm.FDMainConnection.Connected := True;
+         except
+         end;
+         ShowMessage('Erro ao recriar banco: ' + E.Message);
+      end;
+   end;
+
+   FSqlScript.Free;
+end;
+
+procedure TFrmMain.PopulaBancoDados;
+var
+   FSqlScript: TFDQuery;
+begin
+   FSqlScript := TFDQuery.Create(Self);
+   try
+      FSqlScript.Connection := FrmDm.FDMainConnection;
+
+      FSqlScript.SQL.Text := 'SET FOREIGN_KEY_CHECKS = 0';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'TRUNCATE TABLE pedidos_produtos';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'TRUNCATE TABLE pedidos_geral';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'TRUNCATE TABLE produtos';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'TRUNCATE TABLE clientes';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'SET FOREIGN_KEY_CHECKS = 1';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'INSERT INTO clientes (nome, cidade, uf) VALUES ' +
+                             '(''Ana Paula Ferreira'',    ''São Paulo'',      ''SP''),' +
+                             '(''Bruno Costa Lima'',      ''Rio de Janeiro'', ''RJ''),' +
+                             '(''Carla Mendes Santos'',   ''Belo Horizonte'', ''MG''),' +
+                             '(''Diego Oliveira Neto'',   ''Curitiba'',       ''PR''),' +
+                             '(''Elaine Rodrigues'',      ''Porto Alegre'',   ''RS''),' +
+                             '(''Fábio Alves Moreira'',   ''Salvador'',       ''BA''),' +
+                             '(''Gabriela Torres'',       ''Fortaleza'',      ''CE''),' +
+                             '(''Henrique Souza'',        ''Recife'',         ''PE''),' +
+                             '(''Isabela Cunha'',         ''Manaus'',         ''AM''),' +
+                             '(''João Pedro Leal'',       ''Brasília'',       ''DF''),' +
+                             '(''Karina Batista'',        ''Belém'',          ''PA''),' +
+                             '(''Lucas Figueiredo'',      ''Goiânia'',        ''GO''),' +
+                             '(''Mariana Azevedo'',       ''Florianópolis'',  ''SC''),' +
+                             '(''Nilton Barbosa'',        ''Maceió'',         ''AL''),' +
+                             '(''Olívia Carvalho'',       ''Natal'',          ''RN''),' +
+                             '(''Paulo Henrique Dias'',   ''Campo Grande'',   ''MS''),' +
+                             '(''Rafaela Gomes'',         ''Cuiabá'',         ''MT''),' +
+                             '(''Sérgio Pinto'',          ''Teresina'',       ''PI''),' +
+                             '(''Tatiane Nascimento'',    ''João Pessoa'',    ''PB''),' +
+                             '(''Ulisses Martins'',       ''São Luís'',       ''MA'')';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'INSERT INTO produtos (descricao, preco_venda) VALUES ' +
+                             '(''Notebook Dell Inspiron 15'',     3499.90),' +
+                             '(''Monitor LG 24" Full HD'',         899.00),' +
+                             '(''Teclado Mecânico Redragon'',      249.90),' +
+                             '(''Mouse Gamer Logitech G305'',      199.90),' +
+                             '(''Headset HyperX Cloud II'',        499.00),' +
+                             '(''Cadeira Gamer ThunderX3'',       1299.00),' +
+                             '(''SSD Kingston 480GB'',             289.90),' +
+                             '(''Memória RAM 8GB DDR4'',           179.90),' +
+                             '(''Placa de Vídeo GTX 1650'',       1599.00),' +
+                             '(''Fonte 650W Corsair'',             459.90),' +
+                             '(''Gabinete Mid Tower Aerocool'',    299.90),' +
+                             '(''Roteador TP-Link AC1200'',        189.90),' +
+                             '(''Switch 8 Portas Intelbras'',      149.90),' +
+                             '(''Webcam Full HD Logitech C920'',   449.90),' +
+                             '(''Impressora HP Laser M107w'',      799.00),' +
+                             '(''No-break APC 700VA'',             449.00),' +
+                             '(''Cabo HDMI 2.0 2m'',               39.90),' +
+                             '(''Hub USB-C 7 em 1'',              149.90),' +
+                             '(''Suporte p/ Monitor Articulado'', 189.90),' +
+                             '(''Mousepad Gamer XL 900x400mm'',    79.90)';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_geral (data_emissao, cod_cliente, valor_total) VALUES (''2024-01-05'', 1, 3949.70)';
+      FSqlScript.ExecSQL;
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_produtos (num_pedido, cod_produto, quantidade, vr_unitario, vr_total) VALUES ' +
+                             '(1, 1, 1, 3499.90, 3499.90),' +
+                             '(1, 3, 1,  249.90,  249.90),' +
+                             '(1, 4, 1,  199.90,  199.90)';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_geral (data_emissao, cod_cliente, valor_total) VALUES (''2024-01-12'', 3, 2087.90)';
+      FSqlScript.ExecSQL;
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_produtos (num_pedido, cod_produto, quantidade, vr_unitario, vr_total) VALUES ' +
+                             '(2, 2, 2, 899.00, 1798.00),' +
+                             '(2, 7, 1, 289.90,  289.90)';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_geral (data_emissao, cod_cliente, valor_total) VALUES (''2024-02-03'', 5, 1568.80)';
+      FSqlScript.ExecSQL;
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_produtos (num_pedido, cod_produto, quantidade, vr_unitario, vr_total) VALUES ' +
+                             '(3, 6,  1, 1299.00, 1299.00),' +
+                             '(3, 19, 1,  189.90,  189.90),' +
+                             '(3, 20, 1,   79.90,   79.90)';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_geral (data_emissao, cod_cliente, valor_total) VALUES (''2024-02-18'', 7, 2418.70)';
+      FSqlScript.ExecSQL;
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_produtos (num_pedido, cod_produto, quantidade, vr_unitario, vr_total) VALUES ' +
+                             '(4, 9,  1, 1599.00, 1599.00),' +
+                             '(4, 8,  2,  179.90,  359.80),' +
+                             '(4, 10, 1,  459.90,  459.90)';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_geral (data_emissao, cod_cliente, valor_total) VALUES (''2024-03-07'', 10, 789.70)';
+      FSqlScript.ExecSQL;
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_produtos (num_pedido, cod_produto, quantidade, vr_unitario, vr_total) VALUES ' +
+                             '(5, 12, 1, 189.90, 189.90),' +
+                             '(5, 13, 1, 149.90, 149.90),' +
+                             '(5, 14, 1, 449.90, 449.90)';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_geral (data_emissao, cod_cliente, valor_total) VALUES (''2024-03-22'', 2, 1298.00)';
+      FSqlScript.ExecSQL;
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_produtos (num_pedido, cod_produto, quantidade, vr_unitario, vr_total) VALUES ' +
+                             '(6, 5,  1, 499.00, 499.00),' +
+                             '(6, 15, 1, 799.00, 799.00)';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_geral (data_emissao, cod_cliente, valor_total) VALUES (''2024-04-10'', 14, 868.50)';
+      FSqlScript.ExecSQL;
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_produtos (num_pedido, cod_produto, quantidade, vr_unitario, vr_total) VALUES ' +
+                             '(7, 16, 1, 449.00, 449.00),' +
+                             '(7, 17, 3,  39.90, 119.70),' +
+                             '(7, 18, 2, 149.90, 299.80)';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_geral (data_emissao, cod_cliente, valor_total) VALUES (''2024-05-14'', 8, 6196.90)';
+      FSqlScript.ExecSQL;
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_produtos (num_pedido, cod_produto, quantidade, vr_unitario, vr_total) VALUES ' +
+                             '(8, 1, 1, 3499.90, 3499.90),' +
+                             '(8, 2, 1,  899.00,  899.00),' +
+                             '(8, 5, 1,  499.00,  499.00),' +
+                             '(8, 6, 1, 1299.00, 1299.00)';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_geral (data_emissao, cod_cliente, valor_total) VALUES (''2024-06-01'', 17, 1299.40)';
+      FSqlScript.ExecSQL;
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_produtos (num_pedido, cod_produto, quantidade, vr_unitario, vr_total) VALUES ' +
+                             '(9, 7, 2, 289.90, 579.80),' +
+                             '(9, 8, 4, 179.90, 719.60)';
+      FSqlScript.ExecSQL;
+
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_geral (data_emissao, cod_cliente, valor_total) VALUES (''2024-06-20'', 20, 839.50)';
+      FSqlScript.ExecSQL;
+      FSqlScript.SQL.Text := 'INSERT INTO pedidos_produtos (num_pedido, cod_produto, quantidade, vr_unitario, vr_total) VALUES ' +
+                             '(10, 11, 1, 299.90, 299.90),' +
+                             '(10, 12, 1, 189.90, 189.90),' +
+                             '(10, 19, 1, 189.90, 189.90),' +
+                             '(10, 20, 2,  79.90, 159.80)';
+      FSqlScript.ExecSQL;
+
+      ShowMessage('Banco zerado e dados padrão carregados com sucesso!');
+
+   except
+      on E: Exception do
+         ShowMessage('Erro ao limpar banco: ' + E.Message);
+   end;
+
+   FSqlScript.Free;
+end;
+
+procedure TFrmMain.BtnCardUtilsClick(Sender: TObject);
+begin
+   CardPanelMain.ActiveCard := CardUtilsMain;
+end;
+
+end.

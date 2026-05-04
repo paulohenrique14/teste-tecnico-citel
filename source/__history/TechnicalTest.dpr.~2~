@@ -1,0 +1,16 @@
+program TechnicalTest;
+
+uses
+  Vcl.Forms,
+  uMain in 'uMain.pas' {FrmMain},
+  uDm in 'uDm.pas' {FrmDm: TDataModule};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TFrmMain, FrmMain);
+  Application.CreateForm(TFrmDm, FrmDm);
+  Application.Run;
+end.

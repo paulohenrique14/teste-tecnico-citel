@@ -1,0 +1,23 @@
+program TechnicalTest;
+
+uses
+  Vcl.Forms,
+  uMain in 'uMain.pas' {FrmMain},
+  uDm in 'uDm.pas' {FrmDm: TDataModule},
+  uCad in 'uCad.pas' {FrmCad},
+  uCadSalesOrder in 'uCadSalesOrder.pas' {FrmCadSalesOrder},
+  uCrud in 'Class\Crud\uCrud.pas',
+  uCrudSalesOrderProduct in 'Class\Crud\SalesOrderProduct\uCrudSalesOrderProduct.pas',
+  uSqlUtils in 'Class\Utils\uSqlUtils.pas',
+  uSalesOrderProductDelete.Types in 'Class\Types\uSalesOrderProductDelete.Types.pas',
+  uLookup in 'uLookup.pas' {FrmLookup};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TFrmDm, FrmDm);
+  Application.CreateForm(TFrmMain, FrmMain);
+  Application.Run;
+end.

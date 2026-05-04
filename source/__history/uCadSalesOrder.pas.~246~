@@ -1,0 +1,725 @@
+unit uCadSalesOrder;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uCad, Data.DB, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  dxGDIPlusClasses, Vcl.ExtCtrls, FireDAC.Comp.DataSet, FireDAC.Comp.Client,
+  Vcl.Grids, Vcl.DBGrids, Vcl.WinXPanels, Vcl.StdCtrls, System.ImageList,
+  Vcl.ImgList, uDm, Vcl.Mask, Vcl.DBCtrls, FireDAC.Stan.ExprFuncs, System.Generics.Collections,
+  uSalesOrderProductDelete.Types, Vcl.Menus, uLookup;
+
+type
+  
+  TFrmCadSalesOrder = class(TFrmCad)
+    PnlGridProdutos: TPanel;
+    ImageList: TImageList;
+    FDCadnum_pedido: TFDAutoIncField;
+    FDCadcod_cliente: TIntegerField;
+    FDCadvalor_total: TBCDField;
+    DBGridProduto: TDBGrid;
+    DSCadOrder: TDataSource;
+    PnlCreateHeader: TPanel;
+    PnlClientFields: TPanel;
+    BtnSearchClient: TButton;
+    Label2: TLabel;
+    Label1: TLabel;
+    PnlProductsFields: TPanel;
+    Label5: TLabel;
+    Label4: TLabel;
+    Label6: TLabel;
+    BtnSearchProduct: TButton;
+    EdtProductName: TEdit;
+    EdtProductCode: TEdit;
+    EdtProductPrice: TEdit;
+    FDMemCadOrder: TFDMemTable;
+    FDMemCadOrderid: TIntegerField;
+    FDMemCadOrdernum_pedidos: TIntegerField;
+    FDMemCadOrdercod_produto: TIntegerField;
+    FDMemCadOrdervr_unitario: TCurrencyField;
+    FDMemCadOrdervr_total: TCurrencyField;
+    FDMemCadOrderdescricao: TStringField;
+    Label3: TLabel;
+    EdtProductQuantity: TEdit;
+    PnlProductButtons: TPanel;
+    BtnCreateProduct: TButton;
+    BtnEditProduct: TButton;
+    BtnSaveProduct: TButton;
+    BtnDeleteProduct: TButton;
+    BtnCancelProduct: TButton;
+    DBEdtClientCode: TDBEdit;
+    DBEdtClientName: TDBEdit;
+    FDMemCadOrderquantidade: TBCDField;
+    PnlTotal: TPanel;
+    PnlTotalValue: TPanel;
+    LblTotalValue: TLabel;
+    PnlTotalQuantity: TPanel;
+    LblTotalQuantity: TLabel;
+    FDMemCadOrdervr_total_agg: TAggregateField;
+    FDMemCadOrderquantidade_agg: TAggregateField;
+    FDCadnome: TStringField;
+    FDCaddata_emissao: TDateField;
+    BtnCopy: TButton;
+    procedure BtnEditClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure DSCadOrderDataChange(Sender: TObject; Field: TField);
+    procedure BtnSaveClick(Sender: TObject);
+    procedure BtnEditProductClick(Sender: TObject);
+    procedure BtnCreateProductClick(Sender: TObject);
+    procedure BtnSaveProductClick(Sender: TObject);
+    procedure BtnDeleteProductClick(Sender: TObject);
+    procedure DSCadOrderStateChange(Sender: TObject);
+    procedure FormShortCut(var Msg: TWMKey; var Handled: Boolean);
+    procedure DBEdtClientCodeExit(Sender: TObject);
+    procedure DBEdtClientCodeEnter(Sender: TObject);
+    procedure EdtProductCodeEnter(Sender: TObject);
+    procedure EdtProductCodeExit(Sender: TObject);
+    procedure FDMemCadOrderCalcFields(DataSet: TDataSet);
+    procedure DSCadStateChange(Sender: TObject);
+    procedure BtnDeleteClick(Sender: TObject);
+    procedure BtnCreateClick(Sender: TObject);
+    procedure BtnCopyClick(Sender: TObject);
+    procedure DBGridKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure DBGridProdutoKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure BtnCancelClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure BtnSearchClientClick(Sender: TObject);
+    procedure BtnSearchProductClick(Sender: TObject);
+  private
+    FOrderCode: Integer;
+    FSqlSearchOrder: TFDQuery;
+    FOldClientValue: Integer;
+    FOldProductValue: Integer;
+
+    FDeletedItems: TList<TOrderItemDeleted>; 
+
+    procedure LoadOrder(AOrderCode: Integer);
+    procedure FillProductsData;
+    procedure UpdateAggregateFields;
+    procedure LocateClient;
+    procedure LocateProduct;
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmCadSalesOrder: TFrmCadSalesOrder;
+
+implementation
+
+{$R *.dfm}
+
+uses uCrudSalesOrderProduct, uCrud, uSqlUtils;
+
+procedure TFrmCadSalesOrder.BtnCancelClick(Sender: TObject);
+begin
+  inherited;
+   FDeletedItems.Clear
+end;
+
+procedure TFrmCadSalesOrder.BtnCopyClick(Sender: TObject);
+var
+   mOldClientName: String;
+   mOldClientCode: Integer;
+begin
+   LoadOrder(FDCadnum_pedido.AsInteger);
+
+   mOldClientName := FDCad.FieldByName('nome').AsString;
+   mOldClientCode := FDCad.FieldByName('cod_cliente').AsInteger;
+
+   FDCad.Append;
+
+   FDCad.FieldByName('nome').AsString         := mOldClientName;
+   FDCad.FieldByName('cod_cliente').AsInteger := mOldClientCode;
+
+   FDMemCadOrder.First;
+   while not FDMemCadOrder.Eof do
+   begin
+      FDMemCadOrder.Edit;
+      FDMemCadOrder.FieldByName('id').AsInteger := 0;
+      FDMemCadOrder.FieldByName('num_pedido').AsInteger := 0;
+      FDMemCadOrder.Post;
+      FDMemCadOrder.Next;
+   end;
+
+   DBGridProduto.SetFocus;
+end;
+
+procedure TFrmCadSalesOrder.BtnCreateClick(Sender: TObject);
+begin
+  inherited;
+
+   if not FDMemCadOrder.Active then
+      FDMemCadOrder.Open;
+
+   FDMemCadOrder.EmptyDataSet;
+   EdtProductCode.Clear;
+   EdtProductName.Clear;
+   EdtProductQuantity.Clear;
+   EdtProductPrice.Clear;
+
+   DBEdtClientCode.SetFocus;
+end;
+
+procedure TFrmCadSalesOrder.BtnCreateProductClick(Sender: TObject);
+begin
+   FDMemCadOrder.Append;
+   EdtProductCode.Clear;
+   EdtProductCode.SetFocus;
+
+end;
+
+procedure TFrmCadSalesOrder.BtnDeleteClick(Sender: TObject);
+var
+   mDeleteProductOrder: ICrud;
+   mTransaction: TFDTransaction;
+begin
+   if MessageDlg('Tem certeza que deseja apagar o pedido?',mtConfirmation,[mbYes,mbNo],0) = mrYes then
+   begin
+      mTransaction := TFDTransaction.Create(Self);
+      mDeleteProductOrder := TCrudSalesOrderProduct.New;
+
+      try
+         mTransaction.Connection := FrmDm.FDMainConnection;
+
+         FDCad.Transaction := mTransaction;
+
+         mTransaction.StartTransaction;
+
+         try
+            mDeleteProductOrder.Delete(FDMemCadOrder, mTransaction, FDCadnum_pedido.AsInteger);
+
+            FDCad.Delete;
+            FDCad.ApplyUpdates(0);
+
+            mTransaction.Commit;
+         except on E: Exception do
+            begin
+               mTransaction.Rollback;
+               FDCad.Cancel;
+               MessageDlg('Erro ao deletar o pedido: ' + E.Message, mtError, [mbOK], 0);
+            end;
+         end;
+
+
+      finally
+         mTransaction.Free;
+      end;
+   end;
+end;
+
+procedure TFrmCadSalesOrder.BtnDeleteProductClick(Sender: TObject);
+var
+   mItem: TOrderItemDeleted;
+begin
+   if MessageDlg('Deseja excluir este produto?', mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+      Exit;
+
+   if FDMemCadOrderid.AsInteger > 0 then
+   begin
+      mItem.IdItem    := FDMemCadOrderid.AsInteger;
+      mItem.NumPedido := FDMemCadOrdernum_pedidos.AsInteger;
+      FDeletedItems.Add(mItem);
+   end;
+
+  FDMemCadOrder.Delete;
+  UpdateAggregateFields
+end;
+
+procedure TFrmCadSalesOrder.BtnEditClick(Sender: TObject);
+begin
+  inherited;
+   LoadOrder(FDCadnum_pedido.AsInteger);
+
+   DBGridProduto.SetFocus;
+end;
+
+procedure TFrmCadSalesOrder.BtnEditProductClick(Sender: TObject);
+begin
+  inherited;
+   FDMemCadOrder.Edit;
+end;
+
+procedure TFrmCadSalesOrder.BtnSaveClick(Sender: TObject);
+var
+   mTransaction: TFDTransaction;
+   mSaveProductOrder: ICrud;
+   mTotal: Variant;
+begin
+   if FDCadcod_cliente.AsInteger = 0 then
+   begin
+      MessageDlg('Favor informar um cliente para o pedido de venda.',mtInformation,[mbOK],0);
+      DBEdtClientCode.SetFocus;
+      Exit;
+   end;
+
+   if FDMemCadOrder.RecordCount = 0 then
+   begin
+      if MessageDlg('Deseja salvar o pedido sem itens vinculados?',mtConfirmation,[mbYes, mbNo],0) = mrNo then
+      begin
+         EdtProductCode.SetFocus;
+         Exit;
+      end;
+   end;
+
+   mTransaction := TFDTransaction.Create(Self);
+   mSaveProductOrder := TCrudSalesOrderProduct.New;
+   try
+      mTransaction.Connection := FrmDm.FDMainConnection;
+
+      FDCad.Transaction := mTransaction;
+
+      mTransaction.StartTransaction;
+
+      try
+         mTotal := FDMemCadOrder.FieldByName('vr_total_agg').Value;
+
+         if not (VarIsNull(mTotal) or VarIsEmpty(mTotal)) then
+            FDCadvalor_total.AsCurrency := mTotal
+         else
+            FDCadvalor_total.AsCurrency := 0;
+
+         FDCaddata_emissao.AsDateTime := Date;
+
+         FDCad.Post;
+         FDCad.ApplyUpdates(0);
+
+         mSaveProductOrder.UpdateOrInsert(FDMemCadOrder, mTransaction, FDCadnum_pedido.AsInteger);
+         mSaveProductOrder.DeleteItemById(FDeletedItems, mTransaction);
+
+         mTransaction.Commit;
+
+      except on E: Exception do
+         begin
+            mTransaction.Rollback;
+            FDCad.Cancel;
+            MessageDlg('Erro ao salvar pedido: ' + E.Message, mtError, [mbOK], 0);
+         end;
+      end;
+   finally
+      mTransaction.Free;
+      FDeletedItems.Clear;
+   end;
+end;
+
+procedure TFrmCadSalesOrder.BtnSaveProductClick(Sender: TObject);
+begin
+   if Trim(EdtProductCode.Text) = '' then
+   begin
+      MessageDlg('Favor informar um produto.',mtInformation,[mbOK],0);
+      EdtProductCode.SetFocus;
+      Exit;
+   end;
+
+   if (Trim(EdtProductQuantity.Text) = '') or (StrToIntDef(EdtProductQuantity.Text, 0) <= 0) then
+   begin
+      MessageDlg('Favor a quantidade do produto.',mtInformation,[mbOK],0);
+      EdtProductQuantity.SetFocus;
+      Exit;
+   end;
+
+   DSCadOrder.OnDataChange := nil;
+   try
+      FDMemCadOrder.FieldByName('cod_produto' ).AsInteger  := StrToInt(EdtProductCode.Text);
+      FDMemCadOrder.FieldByName('descricao'   ).AsString   := Trim(EdtProductName.Text);
+      FDMemCadOrder.FieldByName('vr_unitario' ).AsCurrency := StrToCurrDef(EdtProductPrice.Text, 0);
+      FDMemCadOrder.FieldByName('quantidade'  ).AsCurrency := StrToCurrDef(EdtProductQuantity.Text, 0);
+      FDMemCadOrder.Post;
+      DBGridProduto.Refresh;
+   finally
+      DSCadOrder.OnDataChange := DSCadOrderDataChange;
+      UpdateAggregateFields
+   end;
+end;
+
+procedure TFrmCadSalesOrder.BtnSearchClientClick(Sender: TObject);
+begin
+   FrmLookup := TFrmLookup.Create('clientes', 'cod_cliente', 'nome');
+   try
+      if FrmLookup.ShowModal = mrOk then
+      begin
+         FDCadcod_cliente.AsInteger := FrmLookup.FSelectedCode;
+         LocateClient
+      end;
+   finally
+      FrmLookup.Free;
+   end;
+end;
+
+procedure TFrmCadSalesOrder.BtnSearchProductClick(Sender: TObject);
+begin
+   FrmLookup := TFrmLookup.Create('produtos', 'cod_produto', 'descricao');
+   try
+      if FrmLookup.ShowModal = mrOk then
+      begin
+         FDCadcod_cliente.AsInteger := FrmLookup.FSelectedCode;
+         LocateProduct
+      end;
+   finally
+      FrmLookup.Free;
+   end;
+end;
+
+procedure TFrmCadSalesOrder.DBEdtClientCodeEnter(Sender: TObject);
+begin
+  inherited;
+   FOldClientValue := FDCadcod_cliente.AsInteger;
+end;
+
+procedure TFrmCadSalesOrder.DBEdtClientCodeExit(Sender: TObject);
+var
+   FDSearch: TFDQuery;
+begin
+   FDSearch := TFDQuery.Create(Self);
+   try
+      if FDCadcod_cliente.AsInteger <> FOldClientValue then
+      begin
+         if TSqlUtils.Locate('clientes', FDSearch, FDCadcod_cliente.AsInteger, 'cod_cliente', ['nome']) then
+            LocateClient
+         else
+         begin
+            FrmLookup := TFrmLookup.Create('clientes', 'cod_cliente', 'nome');
+
+            try
+               if FrmLookup.ShowModal = mrOk then
+               begin
+                  FDCadcod_cliente.AsInteger := FrmLookup.FSelectedCode;
+
+                  if TSqlUtils.Locate('clientes', FDSearch, FDCadcod_cliente.AsInteger, 'cod_cliente', ['nome']) then
+                  begin
+                     FDCadnome.AsString := FDSearch.FieldByName('nome').AsString;
+
+                  end
+               end;
+            finally
+               FrmLookup.Free;
+            end;
+         end;
+      end;
+   finally
+      FDSearch.Free;
+   end;
+end;
+
+procedure TFrmCadSalesOrder.DBGridKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   if DSCad.State <> dsBrowse then Exit;
+
+   case Key of
+      13:
+      begin
+         if FDCad.RecordCount > 0 then
+         begin
+            BtnEdit.Click;
+            Key := 0;
+         end;
+      end;
+
+      46:
+      begin
+         if FDCad.RecordCount > 0 then
+         begin
+            BtnDelete.Click;
+            Key := 0;
+         end;
+      end;
+   end;
+end;
+
+procedure TFrmCadSalesOrder.DBGridProdutoKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+   if DSCadOrder.State <> dsBrowse then Exit;
+
+   case Key of
+      13:
+      begin
+         if FDMemCadOrder.RecordCount > 0 then
+         begin
+            BtnEditProduct.Click;
+            Key := 0;
+         end;
+      end;
+
+      46:
+      begin
+         if FDMemCadOrder.RecordCount > 0 then
+         begin
+            BtnDeleteProduct.Click;
+            Key := 0;
+         end;
+      end;
+   end;
+end;
+
+procedure TFrmCadSalesOrder.DSCadOrderDataChange(Sender: TObject;
+  Field: TField);
+begin
+   FillProductsData;
+end;
+
+procedure TFrmCadSalesOrder.DSCadOrderStateChange(Sender: TObject);
+begin
+  inherited;
+   BtnCreateProduct.Enabled := DSCadOrder.State = dsBrowse;
+   BtnEditProduct.Enabled   := (DSCadOrder.State = dsBrowse) and (FDMemCadOrder.RecordCount > 0);
+   BtnDeleteProduct.Enabled := (DSCadOrder.State = dsBrowse) and (FDMemCadOrder.RecordCount > 0);
+   PnlButtons.Enabled       := DSCadOrder.State = dsBrowse;
+   DBGridProduto.Enabled    := DSCadOrder.State = dsBrowse;
+
+   BtnSaveProduct.Enabled     := dsCadOrder.State in [dsEdit, dsInsert];
+   BtnCancelProduct.Enabled   := dsCadOrder.State in [dsEdit, dsInsert];
+   PnlProductsFields.Enabled  := dsCadOrder.State in [dsEdit, dsInsert];
+   EdtProductCode.Enabled     := dsCadOrder.State in [dsEdit, dsInsert];
+   EdtProductQuantity.Enabled := dsCadOrder.State in [dsEdit, dsInsert];
+end;
+
+procedure TFrmCadSalesOrder.DSCadStateChange(Sender: TObject);
+begin
+  inherited;
+   PnlProductsFields.Enabled := dsCad.State in [dsEdit, dsInsert];
+   BtnCopy.Enabled           := dsCad.State = dsBrowse;
+end;
+
+procedure TFrmCadSalesOrder.EdtProductCodeEnter(Sender: TObject);
+begin
+   FOldProductValue := FDMemCadOrdercod_produto.AsInteger;
+end;
+
+procedure TFrmCadSalesOrder.EdtProductCodeExit(Sender: TObject);
+var
+   FDSearch : TFDQuery;
+begin
+   FDSearch := TFDQuery.Create(Self);
+   try
+      if StrToIntDef(EdtProductCode.Text, 0) <> FOldProductValue then
+      begin
+         if TSqlUtils.Locate('produtos', FDSearch, StrToIntDef(EdtProductCode.Text, 0), 'cod_produto', ['descricao', 'preco_venda']) then
+         begin
+            EdtProductName.Text := FDSearch.FieldByName('descricao').AsString;
+            EdtProductPrice.Text := CurrToStr(FDSearch.FieldByName('preco_venda').AsCurrency);
+         end
+         else
+         begin
+            FrmLookup := TFrmLookup.Create('clientes', 'cod_cliente', 'nome');
+
+            try
+               if FrmLookup.ShowModal = mrOk then
+               begin
+                  FDCadcod_cliente.AsInteger := FrmLookup.FSelectedCode;
+
+                  if TSqlUtils.Locate('produtos', FDSearch, StrToIntDef(EdtProductCode.Text, 0), 'cod_produto', ['descricao', 'preco_venda']) then
+                  begin
+                     FDCadnome.AsString := FDSearch.FieldByName('nome').AsString;
+
+                  end
+               end;
+            finally
+               FrmLookup.Free;
+            end;
+         end;
+      end;
+   finally
+      FDSearch.Free;
+   end;
+
+end;
+
+procedure TFrmCadSalesOrder.FDMemCadOrderCalcFields(DataSet: TDataSet);
+begin
+   if FDMemCadOrder.FieldByName('quantidade' ).IsNull or
+      FDMemCadOrder.FieldByName('vr_unitario').IsNull then
+   begin
+      FDMemCadOrder.FieldByName('vr_total').AsCurrency := 0;
+      Exit;
+   end;
+
+   FDMemCadOrder.FieldByName('vr_total').AsCurrency := FDMemCadOrder.FieldByName('quantidade' ).AsFloat * FDMemCadOrder.FieldByName('vr_unitario').AsCurrency;
+end;
+
+procedure TFrmCadSalesOrder.FillProductsData;
+begin
+  if not FDMemCadOrder.Active then Exit;
+
+   if FDMemCadOrder.RecordCount > 0 then
+   begin
+      EdtProductCode.Text     := FDMemCadOrder.FieldByName('cod_produto').AsString;
+      EdtProductName.Text     := FDMemCadOrder.FieldByName('descricao').AsString;
+      EdtProductQuantity.Text := FDMemCadOrder.FieldByName('quantidade').AsString;
+      EdtProductPrice.Text    := FDMemCadOrder.FieldByName('vr_unitario').AsString;
+   end;
+
+   UpdateAggregateFields;
+end;
+
+procedure TFrmCadSalesOrder.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  inherited;
+   FSqlSearchOrder.Free;
+   FDeletedItems.Free;
+end;
+
+procedure TFrmCadSalesOrder.FormCreate(Sender: TObject);
+begin
+   FDeletedItems := TList<TOrderItemDeleted>.Create;
+   
+   FSqlSearchOrder := TFDQuery.Create(Self);
+
+   FDCad.SQL.Text := 'select pg.num_pedido, c.nome, pg.data_emissao, pg.cod_cliente, pg.valor_total '+
+                     'from pedidos_geral pg '+
+                     'left outer join clientes c on c.cod_cliente = pg.cod_cliente';
+
+   FDCad.Open();
+end;
+
+procedure TFrmCadSalesOrder.FormShortCut(var Msg: TWMKey; var Handled: Boolean);
+begin
+
+   if (PnlProductButtons.Enabled) and (PnlProductButtons.Visible) then
+   begin
+
+      if (Msg.CharCode = VK_F3) then
+      begin
+         if ((BtnCreateProduct.Visible) and (BtnCreateProduct.Enabled) and (DSCadOrder.State in [dsBrowse]) and (CardPanel.ActiveCard = CardCreate)) then
+         begin
+            BtnCreateProduct.SetFocus;
+            BtnCreateProduct.Click;
+            Exit;
+         end;
+      end;
+
+      if (Msg.CharCode = VK_F4) and (CardPanel.ActiveCard = CardCreate) then
+      begin
+         if ((BtnEditProduct.Visible) and (BtnEditProduct.Enabled) and (DSCadOrder.State in [dsBrowse])) then
+         begin
+            BtnEditProduct.SetFocus;
+            BtnEditProduct.Click;
+            Exit;
+         end;
+      end;
+
+      if (Msg.CharCode = VK_F5) and (CardPanel.ActiveCard = CardCreate) then
+      begin
+         if ((BtnSaveProduct.Visible) and (BtnSaveProduct.Enabled)) then
+         begin
+            BtnSaveProduct.SetFocus;
+            BtnSaveProduct.Click;
+            Exit;
+         end;
+      end;
+
+      if (Msg.CharCode = VK_F6) and (CardPanel.ActiveCard = CardCreate) then
+      begin
+         if ((BtnDeleteProduct.Visible) and (BtnDeleteProduct.Enabled)) then
+         begin
+            BtnDeleteProduct.SetFocus;
+            BtnDeleteProduct.Click;
+            Exit;
+         end;
+      end;
+
+      if (Msg.CharCode = VK_F7) then
+      begin
+         if ((BtnCopy.Visible) and (BtnCopy.Enabled)) then
+         begin
+            BtnCopy.SetFocus;
+            BtnCopy.Click;
+            Exit;
+         end;
+      end;
+   end;
+
+   inherited;
+end;
+
+procedure TFrmCadSalesOrder.FormShow(Sender: TObject);
+begin
+  inherited;
+   DBGrid.SetFocus;
+end;
+
+procedure TFrmCadSalesOrder.LoadOrder(AOrderCode: Integer);
+begin
+
+   FSqlSearchOrder.Connection := FrmDm.FDMainConnection;
+
+   FSqlSearchOrder.Close;
+
+   FSqlSearchOrder.SQL.Text := 'Select pp.id, pp.num_pedido, CAST(pp.quantidade AS DECIMAL(10,3)) as quantidade, '+
+                              '       pp.vr_unitario, pp.vr_total, p.cod_produto, p.descricao '+
+                              'from pedidos_produtos pp '+
+                              'left outer join produtos p on p.cod_produto = pp.cod_produto '+
+                              'where num_pedido = :num_pedido';
+
+   FSqlSearchOrder.ParamByName('num_pedido').AsInteger := AOrderCode;
+
+   FSqlSearchOrder.Open();
+
+   if not FDMemCadOrder.Active then
+      FDMemCadOrder.Open;
+
+   FDMemCadOrder.EmptyDataSet;
+
+   FDMemCadOrder.CopyDataSet(FSqlSearchOrder, [coRestart, coAppend]);
+
+   FDMemCadOrder.AggregatesActive := True;
+
+   DSCadOrder.OnStateChange(DSCadOrder);
+
+end;
+
+procedure TFrmCadSalesOrder.LocateClient;
+var
+   FDSearch: TFDQuery;
+begin
+   FDSearch := TFDQuery.Create(Self);
+   try
+      if TSqlUtils.Locate('clientes', FDSearch, FDCadcod_cliente.AsInteger, 'cod_cliente', ['nome']) then
+      begin
+         FDCadnome.AsString := FDSearch.FieldByName('nome').AsString;
+      end
+   finally
+      FDSearch.Free;
+   end;
+end;
+
+procedure TFrmCadSalesOrder.LocateProduct;
+var
+   FDSearch: TFDQuery;
+begin
+   FDSearch := TFDQuery.Create(Self);
+   try
+      if TSqlUtils.Locate('produtos', FDSearch, StrToIntDef(EdtProductCode.Text, 0), 'cod_produto', ['cod_produto, descricao, preco_venda']) then
+      begin
+         EdtProductCode.Text := FrmLookup.FSelectedCode.ToString;
+         EdtProductName.Text := FDSearch.FieldByName('descricao').AsString;
+         EdtProductPrice.Text := FloatToStr(FDSearch.FieldByName('preco_venda').AsFloat);
+      end
+   finally
+      FDSearch.Free;
+   end;
+end;
+
+procedure TFrmCadSalesOrder.UpdateAggregateFields;
+var
+  mQuantityAgg: Variant;
+  mVrTotalAgg: Variant;
+begin
+   mQuantityAgg := FDMemCadOrder.FieldByName('quantidade_agg').Value;
+   mVrTotalAgg  := FDMemCadOrder.FieldByName('vr_total_agg').Value;
+
+   if not (VarIsNull(mQuantityAgg) or VarIsEmpty(mQuantityAgg)) then
+      LblTotalValue.Caption := 'Qtde: ' + FormatFloat('#,##0.000', mQuantityAgg);
+
+   if not (VarIsNull(mVrTotalAgg) or VarIsEmpty(mVrTotalAgg)) then
+      LblTotalQuantity.Caption := 'Total: R$ ' + FormatCurr('#,##0.00', mVrTotalAgg);
+end;
+
+end.

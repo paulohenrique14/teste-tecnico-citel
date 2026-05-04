@@ -1,0 +1,49 @@
+unit uDm;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
+  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.MySQL,
+  FireDAC.Phys.MySQLDef, FireDAC.VCLUI.Wait, Data.DBXMySQL, Data.SqlExpr,
+  Data.DB, FireDAC.Comp.Client, System.IniFiles;
+
+type
+  TFrmDm = class(TDataModule)
+    FDMainConnection: TFDConnection;
+    FDPhysMySQLDriverLink1: TFDPhysMySQLDriverLink;
+    procedure DataModuleCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  FrmDm: TFrmDm;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+procedure TFrmDm.DataModuleCreate(Sender: TObject);
+var
+  ini: TIniFile;
+begin
+  ini := TIniFile.Create(ExtractFilePath('testetecnico') + 'config.ini');
+  try
+    FDMainConnection.Params.Values['Server'   ] := ini.ReadString('Database', 'Server',   'localhost');
+    FDMainConnection.Params.Values['Port'     ] := ini.ReadString('Database', 'Port',     '3306');
+    FDMainConnection.Params.Values['Database' ] := ini.ReadString('Database', 'Database', 'db_pedidos');
+    FDMainConnection.Params.Values['User_Name'] := ini.ReadString('Database', 'User',     'root');
+    FDMainConnection.Params.Values['Password' ] := ini.ReadString('Database', 'Password', '');
+    FDMainConnection.Connected := True;
+  finally
+    ini.Free;
+  end;
+end;
+
+end.

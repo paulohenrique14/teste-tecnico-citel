@@ -1,0 +1,13 @@
+unit uSalesOrderProductDelete;
+
+interface
+
+type
+  TOrderItemDeleted = record
+    IdItem     : Integer;
+    NumPedido  : Integer;
+  end;
+
+implementation
+
+end.

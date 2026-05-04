@@ -1,0 +1,725 @@
+inherited FrmCadSalesOrder: TFrmCadSalesOrder
+  Caption = 'Cadastro de pedido de venda'
+  ClientHeight = 539
+  ClientWidth = 846
+  OnClose = FormClose
+  OnCreate = FormCreate
+  ExplicitWidth = 846
+  ExplicitHeight = 539
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited PnlMain: TPanel
+    Width = 846
+    Height = 539
+    BorderWidth = 1
+    BorderStyle = bsSingle
+    ExplicitWidth = 846
+    ExplicitHeight = 539
+    inherited PnlButtons: TPanel
+      Left = 1
+      Top = 492
+      Width = 840
+      BevelOuter = bvLowered
+      ExplicitLeft = 1
+      ExplicitTop = 492
+      ExplicitWidth = 840
+      inherited BtnDelete: TButton
+        Left = 269
+        Top = 6
+        Height = 30
+        TabOrder = 3
+        OnClick = BtnDeleteClick
+        ExplicitLeft = 269
+        ExplicitTop = 6
+        ExplicitHeight = 30
+      end
+      inherited BtnCreate: TButton
+        Left = 11
+        Top = 6
+        Height = 30
+        TabOrder = 0
+        ExplicitLeft = 11
+        ExplicitTop = 6
+        ExplicitHeight = 30
+      end
+      inherited BtnEdit: TButton
+        Left = 97
+        Top = 6
+        Height = 30
+        TabOrder = 1
+        ExplicitLeft = 97
+        ExplicitTop = 6
+        ExplicitHeight = 30
+      end
+      inherited BtnSave: TButton
+        Left = 183
+        Top = 6
+        Height = 30
+        TabOrder = 2
+        OnClick = BtnSaveClick
+        ExplicitLeft = 183
+        ExplicitTop = 6
+        ExplicitHeight = 30
+      end
+      inherited BtnCancel: TButton
+        Left = 441
+        Top = 6
+        Height = 30
+        TabOrder = 5
+        ExplicitLeft = 441
+        ExplicitTop = 6
+        ExplicitHeight = 30
+      end
+      object BtnCopy: TButton
+        Left = 355
+        Top = 6
+        Width = 86
+        Height = 30
+        Align = alLeft
+        Caption = 'F7 - A partir de'
+        TabOrder = 4
+        OnClick = BtnCopyClick
+      end
+    end
+    inherited PnlTop: TPanel
+      Left = 1
+      Top = 1
+      Width = 840
+      BevelOuter = bvRaised
+      ExplicitLeft = 1
+      ExplicitTop = 1
+      ExplicitWidth = 840
+      inherited LblScreenName: TLabel
+        Left = 11
+        Top = 1
+        Height = 39
+        ExplicitTop = 1
+      end
+      inherited BtnClose: TImage
+        Left = 805
+        Top = 1
+        Height = 39
+        ExplicitLeft = 981
+        ExplicitHeight = 39
+      end
+    end
+    inherited CardPanel: TCardPanel
+      Left = 1
+      Top = 42
+      Width = 840
+      Height = 450
+      ExplicitLeft = 1
+      ExplicitTop = 42
+      ExplicitWidth = 840
+      ExplicitHeight = 450
+      inherited CardCreate: TCard
+        Width = 840
+        Height = 450
+        ExplicitWidth = 840
+        ExplicitHeight = 450
+        object PnlGridProdutos: TPanel
+          Left = 0
+          Top = 115
+          Width = 840
+          Height = 335
+          Align = alBottom
+          BevelOuter = bvNone
+          TabOrder = 0
+          object DBGridProduto: TDBGrid
+            Left = 0
+            Top = 0
+            Width = 840
+            Height = 270
+            Align = alClient
+            DataSource = DSCadOrder
+            Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+            TabOrder = 0
+            TitleFont.Charset = DEFAULT_CHARSET
+            TitleFont.Color = clWindowText
+            TitleFont.Height = -11
+            TitleFont.Name = 'Tahoma'
+            TitleFont.Style = []
+            OnKeyDown = DBGridProdutoKeyDown
+          end
+          object PnlProductButtons: TPanel
+            Left = 0
+            Top = 293
+            Width = 840
+            Height = 42
+            Align = alBottom
+            BevelOuter = bvNone
+            Padding.Left = 10
+            Padding.Top = 5
+            Padding.Bottom = 5
+            TabOrder = 1
+            object BtnCreateProduct: TButton
+              Left = 10
+              Top = 5
+              Width = 86
+              Height = 32
+              Align = alLeft
+              Caption = 'F3 - Cadastrar'
+              TabOrder = 0
+              OnClick = BtnCreateProductClick
+            end
+            object BtnEditProduct: TButton
+              Left = 96
+              Top = 5
+              Width = 86
+              Height = 32
+              Align = alLeft
+              Caption = 'F4 - Editar'
+              TabOrder = 1
+              OnClick = BtnEditProductClick
+            end
+            object BtnSaveProduct: TButton
+              Left = 182
+              Top = 5
+              Width = 86
+              Height = 32
+              Align = alLeft
+              Caption = 'F5 - Gravar'
+              TabOrder = 2
+              OnClick = BtnSaveProductClick
+            end
+            object BtnDeleteProduct: TButton
+              Left = 268
+              Top = 5
+              Width = 86
+              Height = 32
+              Align = alLeft
+              Caption = 'F6 - Deletar'
+              TabOrder = 3
+              OnClick = BtnDeleteProductClick
+            end
+            object BtnCancelProduct: TButton
+              Left = 354
+              Top = 5
+              Width = 86
+              Height = 32
+              Align = alLeft
+              Caption = 'Esc - Cancelar'
+              TabOrder = 4
+            end
+          end
+          object PnlTotal: TPanel
+            Left = 0
+            Top = 270
+            Width = 840
+            Height = 23
+            Align = alBottom
+            BevelOuter = bvNone
+            Padding.Top = 5
+            Padding.Bottom = 5
+            TabOrder = 2
+            object PnlTotalValue: TPanel
+              Left = 680
+              Top = 5
+              Width = 160
+              Height = 13
+              Align = alRight
+              BevelOuter = bvNone
+              TabOrder = 0
+              object LblTotalValue: TLabel
+                Left = 0
+                Top = 0
+                Width = 160
+                Height = 13
+                Align = alClient
+                Alignment = taCenter
+                Caption = 'Total: R$ 0,00'
+                Layout = tlCenter
+                ExplicitWidth = 69
+              end
+            end
+            object PnlTotalQuantity: TPanel
+              Left = 584
+              Top = 5
+              Width = 96
+              Height = 13
+              Align = alRight
+              BevelOuter = bvNone
+              TabOrder = 1
+              ExplicitLeft = 648
+              object LblTotalQuantity: TLabel
+                Left = 0
+                Top = 0
+                Width = 96
+                Height = 13
+                Align = alClient
+                Alignment = taCenter
+                Caption = 'Qtde: 0,00'
+                Layout = tlCenter
+                ExplicitWidth = 53
+              end
+            end
+          end
+        end
+        object PnlCreateHeader: TPanel
+          Left = 0
+          Top = 0
+          Width = 840
+          Height = 115
+          Align = alClient
+          BevelOuter = bvNone
+          Padding.Top = 5
+          TabOrder = 1
+          object PnlClientFields: TPanel
+            Left = 0
+            Top = 5
+            Width = 840
+            Height = 58
+            Align = alTop
+            BevelOuter = bvNone
+            TabOrder = 0
+            object Label2: TLabel
+              Left = 161
+              Top = 1
+              Width = 64
+              Height = 13
+              Caption = 'Raz'#227'o cliente'
+            end
+            object Label1: TLabel
+              Left = 11
+              Top = 1
+              Width = 59
+              Height = 13
+              Caption = 'C'#243'd. Cliente'
+            end
+            object BtnSearchClient: TButton
+              Left = 134
+              Top = 20
+              Width = 23
+              Height = 21
+              ImageAlignment = iaCenter
+              ImageIndex = 0
+              Images = ImageList
+              TabOrder = 2
+            end
+            object DBEdtClientCode: TDBEdit
+              Left = 11
+              Top = 20
+              Width = 121
+              Height = 21
+              DataField = 'cod_cliente'
+              DataSource = DSCad
+              TabOrder = 0
+              OnEnter = DBEdtClientCodeEnter
+              OnExit = DBEdtClientCodeExit
+            end
+            object DBEdtClientName: TDBEdit
+              Left = 161
+              Top = 20
+              Width = 672
+              Height = 21
+              DataField = 'nome'
+              DataSource = DSCad
+              Enabled = False
+              ReadOnly = True
+              TabOrder = 1
+            end
+          end
+          object PnlProductsFields: TPanel
+            Left = 0
+            Top = 63
+            Width = 840
+            Height = 52
+            Align = alTop
+            BevelOuter = bvNone
+            TabOrder = 1
+            object Label5: TLabel
+              Left = 161
+              Top = 4
+              Width = 87
+              Height = 13
+              Caption = 'Descri'#231#227'o produto'
+            end
+            object Label4: TLabel
+              Left = 11
+              Top = 7
+              Width = 64
+              Height = 13
+              Caption = 'C'#243'd. Produto'
+            end
+            object Label6: TLabel
+              Left = 758
+              Top = 4
+              Width = 66
+              Height = 13
+              Caption = 'Pre'#231'o unit'#225'rio'
+            end
+            object Label3: TLabel
+              Left = 655
+              Top = 4
+              Width = 56
+              Height = 13
+              Caption = 'Quantidade'
+            end
+            object BtnSearchProduct: TButton
+              Left = 134
+              Top = 23
+              Width = 23
+              Height = 21
+              ImageAlignment = iaCenter
+              ImageIndex = 0
+              Images = ImageList
+              TabOrder = 4
+            end
+            object EdtProductName: TEdit
+              Left = 161
+              Top = 23
+              Width = 488
+              Height = 21
+              Enabled = False
+              TabOrder = 1
+            end
+            object EdtProductCode: TEdit
+              Left = 11
+              Top = 23
+              Width = 121
+              Height = 21
+              TabOrder = 0
+              OnEnter = EdtProductCodeEnter
+              OnExit = EdtProductCodeExit
+            end
+            object EdtProductPrice: TEdit
+              Left = 736
+              Top = 23
+              Width = 97
+              Height = 21
+              BiDiMode = bdRightToLeft
+              Enabled = False
+              NumbersOnly = True
+              ParentBiDiMode = False
+              TabOrder = 3
+            end
+            object EdtProductQuantity: TEdit
+              Left = 655
+              Top = 23
+              Width = 74
+              Height = 21
+              NumbersOnly = True
+              TabOrder = 2
+            end
+          end
+        end
+      end
+      inherited CardBrowse: TCard
+        Width = 840
+        Height = 450
+        ExplicitWidth = 840
+        ExplicitHeight = 450
+        inherited DBGrid: TDBGrid
+          Width = 840
+          Height = 450
+          OnKeyDown = DBGridKeyDown
+        end
+      end
+    end
+  end
+  inherited FDCad: TFDQuery
+    CachedUpdates = True
+    UpdateOptions.UpdateTableName = 'pedidos_geral'
+    UpdateOptions.KeyFields = 'num_pedido'
+    SQL.Strings = (
+      
+        'select pg.num_pedido, data_emissao, pg.cod_cliente, pg.valor_tot' +
+        'al, c.nome'
+      'from pedidos_geral pg'
+      'left outer join clientes c on c.cod_cliente = pg.cod_cliente')
+    Left = 208
+    Top = 304
+    object FDCadnum_pedido: TFDAutoIncField
+      DisplayLabel = 'C'#243'd. Pedido'
+      FieldName = 'num_pedido'
+      Origin = 'num_pedido'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object FDCaddata_emissao: TDateField
+      DisplayLabel = 'Emiss'#227'o'
+      FieldName = 'data_emissao'
+      Origin = 'data_emissao'
+      Required = True
+    end
+    object FDCadcod_cliente: TIntegerField
+      FieldName = 'cod_cliente'
+      Origin = 'cod_cliente'
+      Required = True
+      Visible = False
+    end
+    object FDCadnome: TStringField
+      AutoGenerateValue = arDefault
+      DisplayLabel = 'Nome cliente'
+      FieldName = 'nome'
+      Origin = 'nome'
+      ProviderFlags = []
+      Size = 100
+    end
+    object FDCadvalor_total: TBCDField
+      AutoGenerateValue = arDefault
+      DisplayLabel = 'Valor total'
+      FieldName = 'valor_total'
+      Origin = 'valor_total'
+      DisplayFormat = ',0.00'
+      Precision = 10
+      Size = 2
+    end
+  end
+  inherited DSCad: TDataSource
+    DataSet = FDCad
+    Left = 272
+    Top = 304
+  end
+  object ImageList: TImageList
+    ColorDepth = cd32Bit
+    DrawingStyle = dsTransparent
+    Left = 464
+    Top = 240
+    Bitmap = {
+      494C010101000500040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      0000000000003600000028000000400000001000000001002000000000000010
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00030000008D0000002000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000030000
+      00A6000000FF0000008D00000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000003000000A30000
+      00FF000000AA0000000400000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000050000003C0000004700000017000000000000009B000000FF0000
+      00A6000000030000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0042000000E2000000F6000000E5000000FC00000096000000D0000000990000
+      0003000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000290000
+      00F50000007C00000005000000000000002D000000D500000096000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000000000000000009D0000
+      00AB000000000000000000000000000000000000002D000000FC000000170000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000CD0000
+      00640000000000000000000000000000000000000000000000E4000000470000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000BD0000
+      007B0000000000000000000000000000000000000005000000F60000003C0000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00000000000000000000000000000000000000000000000000000000006A0000
+      00E5000000150000000000000000000000000000007C000000E2000000050000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000050000
+      00B6000000E50000007B00000064000000AA000000F500000042000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      00040000006A000000BE000000CB0000009C0000002900000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000424D3E000000000000003E000000
+      2800000040000000100000000100010000000000800000000000000000000000
+      000000000000000000000000FFFFFF0000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000}
+  end
+  object DSCadOrder: TDataSource
+    DataSet = FDMemCadOrder
+    OnStateChange = DSCadOrderStateChange
+    OnDataChange = DSCadOrderDataChange
+    Left = 528
+    Top = 320
+  end
+  object FDMemCadOrder: TFDMemTable
+    Active = True
+    OnCalcFields = FDMemCadOrderCalcFields
+    FieldDefs = <
+      item
+        Name = 'id'
+        DataType = ftInteger
+      end
+      item
+        Name = 'num_pedido'
+        DataType = ftInteger
+      end
+      item
+        Name = 'cod_produto'
+        DataType = ftInteger
+      end
+      item
+        Name = 'descricao'
+        DataType = ftString
+        Size = 75
+      end
+      item
+        Name = 'vr_unitario'
+        DataType = ftCurrency
+        Precision = 19
+      end
+      item
+        Name = 'quantidade'
+        DataType = ftBCD
+        Size = 4
+      end>
+    IndexDefs = <>
+    AggregatesActive = True
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    StoreDefs = True
+    Left = 440
+    Top = 328
+    object FDMemCadOrderid: TIntegerField
+      DisplayLabel = 'C'#243'digo'
+      DisplayWidth = 10
+      FieldName = 'id'
+    end
+    object FDMemCadOrdernum_pedidos: TIntegerField
+      DisplayWidth = 10
+      FieldName = 'num_pedido'
+      Visible = False
+    end
+    object FDMemCadOrdercod_produto: TIntegerField
+      DisplayLabel = 'C'#243'd. Produto'
+      DisplayWidth = 10
+      FieldName = 'cod_produto'
+    end
+    object FDMemCadOrderdescricao: TStringField
+      DisplayLabel = 'Descri'#231#227'o '
+      DisplayWidth = 68
+      FieldName = 'descricao'
+      Size = 75
+    end
+    object FDMemCadOrdervr_unitario: TCurrencyField
+      DisplayLabel = 'Valor unit'#225'rio'
+      DisplayWidth = 10
+      FieldName = 'vr_unitario'
+      EditFormat = ',0.00'
+    end
+    object FDMemCadOrderquantidade: TBCDField
+      DisplayLabel = 'Quantidade'
+      FieldName = 'quantidade'
+    end
+    object FDMemCadOrdervr_total: TCurrencyField
+      DisplayLabel = 'Valor total'
+      DisplayWidth = 10
+      FieldKind = fkCalculated
+      FieldName = 'vr_total'
+      EditFormat = ',0.00'
+      Calculated = True
+    end
+    object FDMemCadOrdervr_total_agg: TAggregateField
+      FieldName = 'vr_total_agg'
+      Active = True
+      currency = True
+      DisplayName = ''
+      DisplayFormat = ',0.00'
+      Expression = 'sum(vr_unitario*quantidade)'
+    end
+    object FDMemCadOrderquantidade_agg: TAggregateField
+      FieldName = 'quantidade_agg'
+      Active = True
+      currency = True
+      DisplayName = ''
+      DisplayFormat = ',0.00'
+      Expression = 'sum(quantidade*1)'
+    end
+  end
+end

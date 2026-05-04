@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2026/03/17 22:18:10.000.083,=C:\Users\paulo-dev\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2026/03/17 22:18:37.000.436,C:\Users\paulo-dev\Documents\Embarcadero\Studio\Projects\Unit1.dfm=C:\teste\source\uMain.dfm</Transaction>
+    <Transaction>2026/03/17 22:18:37.000.436,C:\Users\paulo-dev\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\teste\source\uMain.pas</Transaction>
+    <Transaction>2026/03/17 22:18:48.000.958,C:\Users\paulo-dev\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\teste\source\TechnicalTest.dproj</Transaction>
+    <Transaction>2026/03/17 22:18:55.000.391,=C:\teste\source\Unit1.pas</Transaction>
+    <Transaction>2026/03/17 22:19:14.000.292,C:\teste\source\Unit1.dfm=C:\teste\source\uDm.dfm</Transaction>
+    <Transaction>2026/03/17 22:19:14.000.292,C:\teste\source\Unit1.pas=C:\teste\source\uDm.pas</Transaction>
+    <Transaction>2026/03/17 22:42:50.000.365,=C:\teste\source\Unit1.pas</Transaction>
+    <Transaction>2026/03/17 23:10:56.000.640,C:\teste\source\Unit1.dfm=C:\teste\source\uCad.dfm</Transaction>
+    <Transaction>2026/03/17 23:10:56.000.640,C:\teste\source\Unit1.pas=C:\teste\source\uCad.pas</Transaction>
+    <Transaction>2026/03/17 23:11:25.000.664,=C:\teste\source\Unit1.pas</Transaction>
+    <Transaction>2026/03/17 23:12:30.000.706,C:\teste\source\Unit1.pas=C:\teste\source\uCadSalesOrder.pas</Transaction>
+    <Transaction>2026/03/17 23:12:30.000.706,C:\teste\source\Unit1.dfm=C:\teste\source\uCadSalesOrder.dfm</Transaction>
+    <Transaction>2026/03/18 22:05:13.000.974,=C:\teste\source\Unit1.pas</Transaction>
+    <Transaction>2026/03/18 22:12:21.000.132,C:\teste\source\Class\Crud\uCrud.pas=C:\teste\source\Unit1.pas</Transaction>
+    <Transaction>2026/03/18 22:12:25.000.837,=C:\teste\source\Unit1.pas</Transaction>
+    <Transaction>2026/03/18 22:14:07.000.511,C:\teste\source\Class\Crud\SalesOrderProduct\uSalesOrderProduct.pas=C:\teste\source\Unit1.pas</Transaction>
+    <Transaction>2026/03/18 22:30:38.000.857,C:\teste\source\Class\Crud\SalesOrderProduct\uCrudSalesOrderProduct.pas=C:\teste\source\Class\Crud\SalesOrderProduct\uSalesOrderProduct.pas</Transaction>
+    <Transaction>2026/03/19 00:47:41.000.648,=C:\teste\source\Unit1.pas</Transaction>
+    <Transaction>2026/03/19 00:52:15.000.175,C:\teste\source\Class\Utils\uSqlUtils.pas=C:\teste\source\Unit1.pas</Transaction>
+    <Transaction>2026/03/19 23:42:15.000.857,=C:\teste\source\Unit1.pas</Transaction>
+    <Transaction>2026/03/19 23:42:39.000.256,C:\teste\source\Unit1.pas=C:\teste\source\Class\Types\uSalesOrderProductDelete.pas</Transaction>
+    <Transaction>2026/03/19 23:42:59.000.186,C:\teste\source\Class\Types\uSalesOrderProductDelete.pas=C:\teste\source\Class\Types\uSalesOrderProductDelete.Types.pas</Transaction>
+    <Transaction>2026/03/20 01:54:41.000.750,=C:\teste\source\Unit1.pas</Transaction>
+    <Transaction>2026/03/20 01:57:07.000.042,C:\teste\source\Unit1.dfm=C:\teste\source\uLookup.dfm</Transaction>
+    <Transaction>2026/03/20 01:57:07.000.042,C:\teste\source\Unit1.pas=C:\teste\source\uLookup.pas</Transaction>
+  </Transactions>
+</BorlandProject>
